@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- full head section skipped for brevity -->
+</head>
+<body>
+    <!-- ... existing content ... -->
+
+    <!-- Fixed menu-qty-tracker -->
+    <div class="menu-qty-tracker">
+        <div class="menu-qty-group">
+            <label for="stdQty" class="menu-qty-label">Std Qty (kg)</label>
+            <input type="number" id="stdQty" class="menu-qty-input" step="0.001" min="0" placeholder="Enter std qty" onchange="updateQuantityTracker()">
+        </div>
+        <div class="menu-qty-group">
+            <label class="menu-qty-label">Dispensed</label>
+            <div id="dispensedQty" class="menu-qty-value">0.000</div>
+        </div>
+        <div class="menu-qty-group">
+            <label class="menu-qty-label">Remaining</label>
+            <div id="remainingQty" class="menu-qty-value">0.000</div>
+            <div id="quantityWarning" class="menu-qty-warning">Qty mismatch!</div>
+        </div>
+        <div class="menu-qty-group" id="lotSelectGroup" style="display: none;">
+            <label for="lotSelect" class="menu-qty-label">Select Lot</label>
+            <select id="lotSelect" class="menu-qty-input">
+                <option value="" disabled selected>Select Lot</option>
+                <option value="1">I</option>
+                <option value="2">II</option>
+                <option value="3">III</option>
+                <option value="4">IV</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- JS: domCache fix -->
+    <script>
+        const domCache = {
+            // other elements...
+            menuQtyTracker: document.querySelector(".menu-qty-tracker"),
+            // other elements...
+        };
+    </script>
+
+    <!-- ... rest of your page ... -->
+</body>
+</html>
