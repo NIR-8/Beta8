@@ -907,8 +907,7 @@
 <div class="menu-qty-tracker">
                 <div class="menu-qty-group">
                     <label for="stdQty" class="menu-qty-label">Std Qty (kg)</label>
-                    <input type="number" id="stdQty" class="menu-qty-input" step="0.001" min="0" placeholder="Enter std qty" onchange="updateQuantityTracker()">
-                </div>
+                    <input type="number" id="stdQty" class="menu-qty-input" step="0.001" min="0" value="417.000" onchange="updateQuantityTracker()">
                 <div class="menu-qty-group">
                    <label class="menu-qty-label">Dispensed</label>
                     <div id="dispensedQty" class="menu-qty-value">0.000</div>
@@ -1399,6 +1398,19 @@
 
         const showLotSelect = remaining.eq(0);
         domCache.lotSelectGroup.style.display = showLotSelect ? 'block' : 'none';
+
+if (remaining.eq(0)) {
+    // Hide inputs
+    domCache.formulaCalculator.querySelectorAll('.input-group, .input-row, .button-row, .progress-container').forEach(el => el.style.display = 'none');
+
+    // Show only calculations (already shown if calculations exist)
+
+    // Open new tab (only once)
+    if (!window.secondLotOpened) {
+        window.secondLotOpened = true;
+        window.open('https://nir8.pages.dev', '_blank');
+    }
+}
 
         // Updated warning logic
         if (hasFinalCalculations && !remaining.eq(0) || (remaining.lt(0))) {
