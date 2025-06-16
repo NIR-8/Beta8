@@ -891,6 +891,65 @@
     }
 }
 
+
+/* ===== NEW STYLES ADDED AT THE END ===== */
+.tabs-container {
+    display: none;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 20px;
+}
+.tabs-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+.tab-button {
+    padding: 8px 16px;
+    background: #f1f1f1;
+    border: none;
+    border-radius: 5px 5px 0 0;
+    cursor: pointer;
+    font-weight: 600;
+}
+.tab-button.active {
+    background: #28a745;
+    color: white;
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+/* Suggestion Popup */
+.suggestion-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    z-index: 1000;
+    max-width: 400px;
+    text-align: center;
+}
+.suggestion-popup h3 { margin-top: 0; color: #28a745; }
+.suggestion-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+.suggestion-popup button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.suggestion-confirm {
+    background: #28a745;
+    color: white;
+}
     </style>
 </head>
 <body>
