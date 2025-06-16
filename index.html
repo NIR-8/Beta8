@@ -2294,6 +2294,143 @@ async function calculate(formulaType) {
 
     newEntry.focus();
 }
+
+// ===== 1. ADD THESE TO YOUR EXISTING CONSTANTS/VARIABLES =====
+const CONSTANTS = {
+    // ... keep all your original constants ...
+    DEFAULT_STD_QTY: '417.000',
+    MAX_ARCHIVED: 5
+};
+
+// Add to state variables
+let archivedCalculations = [];
+let hasShownSuggestion = false;
+
+// Add to domCache
+const domCache = domCache || {};
+domCache.tabsContainer = document.getElementById("tabsContainer");
+domCache.currentTabContent = document.getElementById("currentTab");
+
+// ===== 2. NEW FUNCTIONS =====
+function showStdQtySuggestion() {
+    if (hasShownSuggestion || domCache.stdQtyInput.value !== CONSTANTS.DEFAULT_STD_QTY) return;
+    
+    const popup = document.createElement('div');
+    popup.className = 'suggestion-popup';
+    popup.innerHTML = `
+        <h3>Standard Quantity</h3>
+        <p>Default value is set to ${CONSTANTS.DEFAULT_STD_QTY} kg. Would you like to change it?</p>
+        <div class="suggestion-buttons">
+            <button class="suggestion-confirm" onclick="updateStdQty()">Edit Value</button>
+            <button onclick="closeSuggestion()">Keep Default</button>
+        </div>
+    `;
+    document.body.appendChild(popup);
+    hasShownSuggestion = true;
+}
+function closeSuggestion() {
+    const popup = document.querySelector('.suggestion-popup');
+    if (popup) popup.remove();
+}
+function updateStdQty() {
+    closeSuggestion();
+    domCache.stdQtyInput.focus();
+}
+function archiveCalculations() {
+    if (!domCache.lotSelect.value) {
+        alert("Please select a lot number before archiving.");
+        return;
+    }
+    const lotName = `Lot ${domCache.lotSelect.options[domCache.lotSelect.selectedIndex].text}`;
+    archivedCalculations.unshift({
+        calculations: [...calculations],
+        timestamp: new Date().toLocaleString(),
+        lotNumber: lotName
+    });
+    // Keep only latest archives
+    if (archivedCalculations.length > CONSTANTS.MAX_ARCHIVED) {
+        archivedCalculations.pop();
+    }
+    // Reset current calculations
+    calculations = [];
+    calculationCount = 0;
+    domCache.stepsContainer.innerHTML = "";
+    domCache.calculationSteps.classList.add("hidden");
+    updateTabsUI();
+}
+function updateTabsUI() {
+    if (archivedCalculations.length === 0) {
+        domCache.tabsContainer.style.display = 'none';
+        return;
+    }
+    domCache.tabsContainer.style.display = 'block';
+    const tabsHeader = domCache.tabsContainer.querySelector('.tabs-header');
+    // Update tab buttons
+    tabsHeader.innerHTML = `
+        <button class="tab-button active" data-tab="current">Current</button>
+        ${archivedCalculations.map((arch, i) => `
+            <button class="tab-button" data-tab="archived${i}">${arch.lotNumber}</button>
+        `).join('')}
+    `;
+    // Update tab contents
+    document.querySelectorAll('.tab-content:not(#currentTab)').forEach(el => el.remove());
+    archivedCalculations.forEach((arch, i) => {
+        const tabId = `archived${i}Tab`;
+        if (!document.getElementById(tabId)) {
+            const tab = document.createElement('div');
+            tab.className = 'tab-content';
+            tab.id = tabId;
+            tab.innerHTML = `
+                <div class="calculation-steps">
+                    <button onclick="printArchived(${i})" class="print-btn">Print ${arch.lotNumber}</button>
+                    <div class="steps-container" id="archivedSteps${i}"></div>
+                </div>
+            `;
+            domCache.tabsContainer.appendChild(tab);
+            // Render calculations
+            const container = document.getElementById(`archivedSteps${i}`);
+            arch.calculations.forEach(calc => {
+                const entry = document.createElement("div");
+                entry.className = "calculation-entry";
+                entry.innerHTML = `
+                    <div class="lot-label">${arch.lotNumber}</div>
+                    <div class="reference-values">W="${calc.W}" A="${calc.A}"</div>
+                    <div class="calculation-content">${calc.plainText}</div>
+                `;
+                container.appendChild(entry);
+            });
+        }
+    });
+    // Tab switching
+    tabsHeader.querySelectorAll('.tab-button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            const tabId = btn.dataset.tab;
+            document.getElementById(tabId === 'current' ? 'currentTab' : `${tabId}Tab`).classList.add('active');
+        });
+    });
+}
+
+// ===== 3. MODIFIED FUNCTIONS =====
+const originalUpdateQuantityTracker = updateQuantityTracker;
+updateQuantityTracker = function() {
+    originalUpdateQuantityTracker.apply(this, arguments);
+    // Add this at the end of the function:
+    if (remaining.eq(0)) {
+        archiveCalculations();
+    }
+}
+
+// ===== 4. INITIALIZATION =====
+document.addEventListener("DOMContentLoaded", () => {
+    // ... keep all your original initialization ...
+    domCache.stdQtyInput.value = CONSTANTS.DEFAULT_STD_QTY;
+    domCache.QInput.addEventListener('focus', () => {
+        if (!hasShownSuggestion) showStdQtySuggestion();
+    }, { once: true });
+});
 </script>
 </body>
 </html>
